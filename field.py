@@ -23,10 +23,10 @@ def field():
     game_window.protocol('WM_DELETE_WINDOW', game_window.destroy)
     
     const_len = 20
-    for i in range(10, 601, const_len):
-        for j in range(10, 601, const_len):
-            if fields[i][j] == '#':
-                w.create_rectangle(j - const_len // 2, i + const_len // 2, j + const_len // 2, i - const_len // 2, fill = 'black')
+    for i in range(9, 390, const_len):
+        for j in range(9, 390, const_len):
+            if fields[(i - const_len // 2 + 1)//const_len][(j - const_len // 2 + 1)//const_len] == '#':
+                game_field.create_rectangle(j - const_len // 2, i + const_len // 2, j + const_len // 2, i - const_len // 2, fill = 'black')
             else:
-                w.create_rectangle(j - const_len // 2, i + const_len // 2, j + const_len // 2, i - const_len // 2, fill = 'blue')
+                game_field.create_rectangle(j - const_len // 2, i + const_len // 2, j + const_len // 2, i - const_len // 2, fill = 'blue')
     game_window.mainloop()
