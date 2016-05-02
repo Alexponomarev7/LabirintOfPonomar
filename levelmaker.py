@@ -3,8 +3,57 @@ import const
 from PIL import ImageTk, Image
 
 
-def choose(sq, sq_u, sq_d, sq_l, sq_r):
+def choose(sq_u, sq_d, sq_l, sq_r):
+    if not sq_u and not sq_d and not sq_l and not sq_r:
+        return images[1]
     
+    if sq_u and sq_d and sq_l and sq_r:
+        return images[0]
+        
+    if sq_u and sq_d and not sq_l and sq_r:
+        return images[3]
+    
+    if not sq_u and sq_d and sq_l and sq_r:
+        return images[2]
+    
+    if sq_u and not sq_d and sq_l and sq_r:
+        return images[4]
+    
+    if sq_u and sq_d and sq_l and not sq_r:
+        return images[5]
+    
+    if not sq_u and not sq_d and sq_l and sq_r:
+        return images[6]
+    
+    if  sq_u and sq_d and not sq_l and not sq_r:
+        return images[7]
+    
+    if  not sq_u and sq_d and sq_l and not sq_r:
+        return images[10]  
+    
+    if  not sq_u and sq_d and not sq_l and sq_r:
+        return images[11]    
+    
+    if  sq_u and not sq_d and not sq_l and sq_r:
+        return images[12]  
+    
+    if  sq_u and not sq_d and sq_l and not sq_r:
+        return images[13]  
+    
+    if  not sq_u and not sq_d and sq_l and not sq_r:
+        return images[14]    
+    
+    if  not sq_u and sq_d and not sq_l and not sq_r:
+        return images[15]  
+    
+    if  not sq_u and not sq_d and not sq_l and sq_r:
+        return images[16]                
+    
+    if  sq_u and not sq_d and not sq_l and not sq_r:
+        return images[17]                
+    
+    return images[0]
+
 
 def render():
     global panel, desk, painted
@@ -13,7 +62,30 @@ def render():
         for j in range(width):
             if desk[i][j] == '#':
                 panel.delete(painted[i][j])
-                panel.create_image(j * const.BLOCK_SIZE + const.EPS_X, i * const.BLOCK_SIZE + const.EPS_Y)
+                
+                if i == 0:
+                    sq_u = True
+                else:
+                    sq_u = (desk[i - 1][j] == '.')
+                    
+                if i == height - 1:
+                    sq_d = True
+                else:
+                    sq_d = (desk[i + 1][j] == '.')
+                    
+                if j == 0:
+                    sq_l = True
+                else:
+                    sq_l = (desk[i][j - 1] == '.')
+                    
+                if j == width - 1:
+                    sq_r = True
+                else:
+                    sq_r = (desk[i][j + 1] == '.')
+                
+                img = choose(sq_u, sq_d, sq_l, sq_r)
+                
+                painted[i][j] = panel.create_image(j * const.BLOCK_SIZE + const.EPS_X, i * const.BLOCK_SIZE + const.EPS_Y, image=img, anchor="nw")
             
 
 def init():
@@ -91,10 +163,19 @@ def enter(event):
     
     print(event.x, event.y)
     
+    
+def load():
+    global images
+    for i in range(6):
+        if i > 1:
+            for j in range(4):
+                images.append(ImageTk.PhotoImage(Image.open("src/sprite_" + str(i + 1) + ".png").rotate(90 * j)))
+        else:
+            images.append(ImageTk.PhotoImage(Image.open("src/sprite_" + str(i + 1) + ".png")))
 
 if __name__ == '__main__':    
     init()
-    #get_settings()
+    #get_settings()    
     
     name="a"
     width=10
@@ -104,20 +185,21 @@ if __name__ == '__main__':
     root.title("Editor 1.0 - " + name)
     root.geometry(const.get_size(width + 4, height))
     
-    img1= Image.open("src/a.png")    
-    img= ImageTk.PhotoImage(img1)
-    
-    print(const.BLOCK_SIZE)
+    images = []
+    load()    
+    #print(const.BLOCK_SIZE)
 
     
     panel = tkinter.Canvas(width=const.BLOCK_SIZE * width + const.EPS_X, height=const.BLOCK_SIZE * height + const.EPS_Y)
     panel.place(relx=0, rely=0)
     
-    panel.create_image(const.EPS_X, const.EPS_Y, image=img, anchor="nw")
+    #img1= Image.open("src/sprite_1.png")    
+    #img= ImageTk.PhotoImage(img1)    
+    #panel.create_image(const.EPS_X, const.EPS_Y, image=img, anchor="nw")
     
     panel.create_line(const.BLOCK_SIZE * width - 1 + const.EPS_X, 0, const.BLOCK_SIZE * width - 1 + const.EPS_X, const.BLOCK_SIZE * height)
     
-    btn_render = tkinter.Button(text="render")
+    btn_render = tkinter.Button(text="render", command=render)
     btn_render.place(relx=1, rely=0, height=const.BLOCK_SIZE, width=const.BLOCK_SIZE*4, anchor="ne")
     
     btn_save = tkinter.Button(text="save")
