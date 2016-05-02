@@ -7,7 +7,7 @@ def load(number=1):
     fin = open('level'+str(number)+'.txt','r')
     fields = fin.readlines()
     for i in range(len(fields)):
-        fields[i] = fields[i].strip()
+        fields[i] = list(fields[i].strip())
     render = threading.Thread(target = field)
     render.start()
 
@@ -23,10 +23,10 @@ def field():
     game_window.protocol('WM_DELETE_WINDOW', game_window.destroy)
     
     const_len = 20
-    for i in range(9, 390, const_len):
-        for j in range(9, 390, const_len):
-            if fields[(i - const_len // 2 + 1)//const_len][(j - const_len // 2 + 1)//const_len] == '#':
-                game_field.create_rectangle(j - const_len // 2, i + const_len // 2, j + const_len // 2, i - const_len // 2, fill = 'black')
+    for i in range(len(fields)):
+        for j in range(len(fields[i])):
+            if fields[i][j] == '#':
+                game_field.create_rectangle(j * const_len, (i + 1) * const_len, (j + 1) * const_len, i*const_len, fill = 'black')
             else:
-                game_field.create_rectangle(j - const_len // 2, i + const_len // 2, j + const_len // 2, i - const_len // 2, fill = 'blue')
+                game_field.create_rectangle(j * const_len, (i + 1) * const_len, (j + 1) * const_len, i*const_len, fill = 'blue')
     game_window.mainloop()
