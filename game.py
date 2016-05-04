@@ -26,6 +26,7 @@ def load():
             images.append(img)
           #  images_d1.append(ImageTk.PhotoImage(Image.eval(img, func)))
  
+ 
 class render_data:
     def __init__(self, level, width, height):
         self.level = level

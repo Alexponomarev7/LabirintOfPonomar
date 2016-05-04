@@ -13,7 +13,7 @@ def game(self):
         self.y += self.dy
         
         if self.level[self.y][self.x] == '#':
-            self.back()
+            self.back(self)
         
         self.repaint()
                 
@@ -101,7 +101,7 @@ class field:
         threading.Thread(target=game, args=(self,)).start()
                     
         
-    def back(self):
+    def back(self, event):
         self.frame_field.destroy()   
 
         
@@ -118,12 +118,29 @@ class field:
         dx = 10 * self.dx
         dy = 10 * self.dy
         
+        last = time.time()
+        
         self.panel.itemconfig(self.hero, image=self.h[self.hnow])
         self.hnow = (self.hnow + 1) % 2
-        for _ in range(5):            
-            self.panel.move(self.pole, -dx, -dy)
-            #time.sleep(0.01)
-                        
+        self.panel.move(self.pole, -dx, -dy)            
+        while time.time() - last < (0.2) / 5:
+            continue
+        
+        self.panel.move(self.pole, -dx, -dy)            
+        while time.time() - last < 2 * (0.2) / 5:
+            continue
+
+        self.panel.move(self.pole, -dx, -dy)            
+        while time.time() - last < 3 * (0.2) / 5:
+            continue
+
+        self.panel.move(self.pole, -dx, -dy)            
+        while time.time() - last < 4 * (0.2) / 5:
+            continue
+
+        self.panel.move(self.pole, -dx, -dy)            
+        while time.time() - last < 5 * (0.2) / 5:
+            continue
                 
                 
     def try_up(self, event):
