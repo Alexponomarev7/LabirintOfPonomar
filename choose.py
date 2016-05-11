@@ -1,3 +1,4 @@
+# some magic parsing
 def choose(sq_u, sq_d, sq_l, sq_r):
     if not sq_u and not sq_d and not sq_l and not sq_r:
         return 1

@@ -1,127 +1,87 @@
 import tkinter
-from PIL import ImageTk, Image
-import const
-from choose import choose
-from const import images, images_d1, render_levels
-import threading
 import time
+import const
+import threading
 
+from mob import Mob
+from render import render_map
 
-def game(self):
-    while True:
-        self.x += self.dx
-        self.y += self.dy
-        
-        if self.level[self.y][self.x] == '#':
-            self.back(self)
-        
-        self.repaint()
+from PIL import ImageTk, Image
                 
-        #time.sleep(1/8)
+
+class Field:
+    def __init__(self, root, loader=None):                
+        self.frame = tkinter.Frame(root, width=const.WIDTH_FRAME, height=const.HEIGHT_FRAME, bg='black', bd=5)
+        self.loader = loader
+        self.buffer = []
+        self.root = root
+        
+        self.hero = Mob()        
+        animation = [self.loader.load("man1.png", size=(50, 50)),
+                     self.loader.load("man2.png", size=(50, 50))]
+        self.hero.load_animation(animation)
+        
+        back_img = self.loader.load("back.png", size=(110, 40))
+        
+        self.back_btn = tkinter.Label(self.frame, image=back_img, bg="black", cursor="hand2") 
+        self.back_btn.place(anchor='ne', relx=1, rely=0)
+        self.back_btn.bind('<1>', self.destroy) 
+        
+    
+    def create(self, event):
+        self.root.bind('<s>', self.hero.try_down)
+        self.root.bind('<w>', self.hero.try_up)
+        self.root.bind('<a>', self.hero.try_left)
+        self.root.bind('<d>', self.hero.try_right)
+        
+        self.frame.place(anchor='center', relx=0.5, rely=0.5, relwidth=1, relheight=1)   
+        self.panel = tkinter.Canvas(self.frame, width=const.WIDTH_PANEL, height=const.HEIGHT_PANEL, bd=0, bg="black")
+        self.panel.place(x=0, y=0)
+        threading.Thread(target=self.play).start()
+        self.alive = True
+    
+    
+    def play(self):
+        map_image = render_map(self, self.level, self.loader)
+        self.map_image = ImageTk.PhotoImage(map_image)
+        
+        x = 5 + (4 - self.hero.x) * 50
+        y = 5 + (4 - self.hero.y) * 50
+        
+        self.pole = self.panel.create_image(x, y, image=self.map_image, anchor="nw")
+        self.hero_img = self.panel.create_image(5 + 4 * 50, 5 + 4 * 50, image=self.hero.current_image, anchor="nw")
+        
+        while self.alive:
+            self.hero.x += self.hero.dx
+            self.hero.y += self.hero.dy
+        
+            if self.level[self.hero.y][self.hero.x] == '#':
+                self.back(self)
+                return
+        
+            self.repaint()
+    
+        
+    def destroy(self, event):
+        self.frame.unbind('<s>')
+        self.frame.unbind('<w>')
+        self.frame.unbind('<a>')
+        self.frame.unbind('<d>')
+        
+        self.alive = False
+        
+        self.frame.place_forget()   
 
             
-
-def render(self, i, j):
-    if i < 0 or i >= self.height:
-        return -1
-    
-    if j < 0 or j >= self.width:
-        return -1
-    
-    if self.level[i][j] == '#':
-        if i == 0:
-            sq_u = True
-        else:
-            sq_u = (self.level[i - 1][j] != '#')
-        
-        
-        if i == self.height - 1:
-            sq_d = True
-        else:
-            sq_d = (self.level[i + 1][j] != '#')
-
-                    
-        if j == 0:
-            sq_l = True
-        else:
-            sq_l = (self.level[i][j - 1] != '#')
-                    
-                    
-        if j == self.width - 1:
-            sq_r = True
-        else:
-            sq_r = (self.level[i][j + 1] != '#')
-                
-        img = choose(sq_u, sq_d, sq_l, sq_r)
-        return images[img]
-    else:
-        return images[18]
-
-
-class field:
-    def __init__(self, root, back_img, h1, h2, level=1):
-        self.h = [h1, h2]
-        self.hnow = 0 
-        self.dx = 0
-        self.dy = 0
-        
-        self.root = root
-        self.root.bind('<s>', self.try_down)
-        self.root.bind('<w>', self.try_up)
-        self.root.bind('<a>', self.try_left)
-        self.root.bind('<d>', self.try_right)
-                
-        
-        self.frame_field =  tkinter.Frame(root, width=580, height=460, bg='black', bd=5)
-        self.frame_field.place(anchor='center', relx=0.5, rely=0.5, relwidth=1, relheight=1)
-                
-        
-        self.back_btn = tkinter.Label(self.frame_field, image=back_img, bg="black", cursor="hand2") 
-        self.back_btn.place(anchor='ne', relx=1, rely=0)
-        self.back_btn.bind('<1>', self.back) 
-        
-        f_r = open('./levels/lvl' + str(level) + ".txt", 'r')
-        self.level = [[j for j in i.strip()] for i in f_r.read().split('\n')]
-        f_r.close()
-        
-        self.width = len(self.level[0])
-        self.height = len(self.level)
-
-        
-        self.desk_lab = [[None] * self.width for i in range(self.height)]
-        
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.level[i][j] == "s":
-                    self.x = j
-                    self.y = i
-        
-        self.init()     
-        
-        threading.Thread(target=game, args=(self,)).start()
-                    
-        
-    def back(self, event):
-        self.frame_field.destroy()   
-
-        
-    def init(self):
-        self.panel = tkinter.Canvas(self.frame_field, width=5+9* const.BLOCK_SIZE, height=5+9*const.BLOCK_SIZE, bd=0,bg="black")
-        self.panel.place(x=0, y=0)
-        self.pole = self.panel.create_image(5 + (4 - self.x) * 50, 5 + (4 - self.y)* 50, image=render_levels[1], anchor="nw")
-        self.hero = self.panel.create_image(5 + 4 * 50, 5 + 4 * 50, image=self.h[0], anchor="nw")
-        
-        self.panel.focus_set()
-        
-    
     def repaint(self):
-        dx = 10 * self.dx
-        dy = 10 * self.dy
+        dx = 10 * self.hero.dx
+        dy = 10 * self.hero.dy
         
         last = time.time()
         
-        self.panel.itemconfig(self.hero, image=self.h[self.hnow])
-        self.hnow = (self.hnow + 1) % 2
+        self.hero.next_frame()
+        self.panel.itemconfig(self.hero_img, image=self.hero.current_image)
+        
         self.panel.move(self.pole, -dx, -dy)            
         while time.time() - last < (0.2) / 5:
             continue
@@ -141,27 +101,23 @@ class field:
         self.panel.move(self.pole, -dx, -dy)            
         while time.time() - last < 5 * (0.2) / 5:
             continue
-                
-                
-    def try_up(self, event):
-        if self.level[self.y - 1][self.x] != '#':
-            self.dy = -1
-            self.dx = 0
-            
-            
-    def try_down(self, event):
-        if self.level[self.y + 1][self.x] != '#':
-            self.dy = 1
-            self.dx = 0    
-            
-            
-    def try_right(self, event):
-        if self.level[self.y][self.x + 1] != '#':
-            self.dy = 0
-            self.dx = 1
-            
     
-    def try_left(self, event):
-        if self.level[self.y][self.x - 1] != '#':
-            self.dy = 0
-            self.dx = -1  
+    
+    
+    def load_level(self, level=1):
+        self.level_number = level
+        
+        f_r = open('./levels/lvl' + str(level) + ".txt", 'r')
+        self.level = [[j for j in i.strip()] for i in f_r.read().split('\n')]
+        f_r.close()
+        
+        self.width = len(self.level[0])
+        self.height = len(self.level)        
+        
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.level[i][j] == "s":
+                    self.hero.y = i
+                    self.hero.x = j
+                    
+        self.hero.level = self.level
