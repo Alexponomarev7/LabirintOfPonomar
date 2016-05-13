@@ -1,17 +1,17 @@
 from PIL import ImageTk, Image
 import field
 import const
+from choose import choose
 
 class render_data:
     def __init__(self, level, width, height):
         self.level = level
         self.width = width
-        self.height = height
-          
+        self.height = height         
 
 
 def render_map(self, level, ld):
-    """f_r = open('./levels/lvl' + str(level) + ".txt", 'r')
+    f_r = open('./levels/lvl' + str(level) + ".txt", 'r')
     level = [[j for j in i.strip()] for i in f_r.read().split('\n')]
     f_r.close()
     
@@ -21,15 +21,14 @@ def render_map(self, level, ld):
     maps = Image.new("RGBA", (width * 50, height * 50))
     for i in range(height):
         for j in range(width):
-            maps.paste(field.render(render_data(level, width, height), i, j), (j * 50, i * 50))
+            maps.paste(render(render_data(level, width, height), i, j), (j * 50, i * 50))
             
-    self.buffer.append(ImageTk.PhotoImage(maps))"""
+    self.buffer.append(maps)
     
-    self.buffer.append(ld.load("map1.png", tk=False))
     return self.buffer[-1]
     
 
-"""    def render(self, i, j):
+def render(self, i, j):
         if i < 0 or i >= self.height:
             return -1
         
@@ -61,7 +60,6 @@ def render_map(self, level, ld):
                 sq_r = (self.level[i][j + 1] != '#')
                     
             img = choose(sq_u, sq_d, sq_l, sq_r)
-            return images[img]
+            return const.images[img]
         else:
-            return images[18]
-"""
+            return const.images[18]

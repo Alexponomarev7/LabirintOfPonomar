@@ -24,8 +24,11 @@ if __name__ == '__main__':
     ld = Loader()
     
     # loading base blocks
-    for i in range(const.BLOCK_COUNT):
-        const.blocks.append(ld.load("sprite_" + str(i + 1) + ".png", tk=False, size=(50, 50)))
+    const.images.append(ld.load("sprite_1.png", tk=False, size=(50, 50)))
+    const.images.append(ld.load("sprite_2.png", tk=False, size=(50, 50)))
+    for i in range(2, const.BLOCK_COUNT):
+        for j in range(4):
+            const.images.append(ld.load("sprite_" + str(i + 1) + ".png", tk=False, size=(50, 50)).rotate(90*j))
         
     # making frame menu object
     frame_menu = Menu(root, loader=ld)
@@ -39,10 +42,7 @@ if __name__ == '__main__':
     # configurate menu object
     frame_menu.new_game_btn.bind('<1>', frame_field.create)
     frame_menu.credits_btn.bind('<1>', frame_credits.create)
-    
-    # loading level 1
-    frame_field.load_level()
-    
+        
     # placing menu object
     frame_menu.create()    
     

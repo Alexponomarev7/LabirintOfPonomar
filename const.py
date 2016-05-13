@@ -9,6 +9,7 @@ TITLE = "Labirint Of Ponomar"
 BLOCK_SIZE = 50
 blocks = []
 render_levels = dict()
+images = []
 
 BLOCK_COUNT = 7
 LVL_COUNT = 1

@@ -165,7 +165,7 @@ if __name__ == '__main__':
     
     root = tkinter.Tk()
     root.title("Editor 1.0 - " + name)
-    root.geometry(const.get_size(width + 4, height))
+    root.geometry(str(width*50 + 4) + "x" + str(height*50) + "+0+0")
     
     images = []
     load()    
